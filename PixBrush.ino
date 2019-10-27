@@ -1,3 +1,14 @@
+/*  
+ *  Author: Luca Bellan
+ *   
+ *  BEFORE UPLOAD:
+ *    Edit file: FishinoXPT2046.h
+ *    And uncomment/set following lines:
+ *      #define TOUCH_CS  6
+ *      #define TOUCH_IRQ 3
+ */
+
+
 #include "SPI.h"
 #include "FishinoGFX.h"
 #include "FishinoILI9341SPI.h"
@@ -14,11 +25,13 @@
 #ifdef SDCS
   #define SD_CS SDCS
 #else
-  #define SD_CS 4
-#endif  
-#define LED_PIN 13
+  #define SD_CS 10
+#endif
+#define TFT_DC 5
+#define TFT_CS 2
+#define LED_PIN 7
 #define BACKLIGHT_PIN 8
-#define BUZZER_PIN 9
+#define BUZZER_PIN 4
 #define BATTERY_PIN A0
 
 //  Buttons position definition
@@ -94,7 +107,7 @@ CRGB leds[288];
 void setup() {
 
   Serial.begin(115200);
-  tft.begin();
+  tft.begin(TFT_CS, TFT_DC);
   tft.setRotation(2);
   touch.setRotation(2);
 
