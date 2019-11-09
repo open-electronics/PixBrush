@@ -21,3 +21,6 @@ Paint with light! (A light painting NeoPixel tool)
 2) The image that you want to show must be rotated to the right by 90 degrees
 3) The image must have exactly the width equal to the number of NeoPixels used on the PixBrush (example: 144 NeoPixels = 144px)
 4) Upload the image on the SD card and put the SD card on PixBrush
+5) Switch on PixBrush and set to your smartphone or reflex a long exposure time (example: 15sec.) and low ISO (exampe: 100)
+6) While taking the picture, move in front of the lens from left to right by starting the image scan and holding PixBrush vertically
+7) Try to maintain a constant and fluid movement
