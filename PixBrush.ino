@@ -32,7 +32,6 @@
 #define LED_PIN 7
 #define BACKLIGHT_PIN 8
 #define BUZZER_PIN 4
-#define BATTERY_PIN A0
 
 //  Buttons position definition
 #define BCK_BUTTON_X 0
@@ -83,7 +82,6 @@ String Files[50];
 byte FileNumber = 0;
 byte CursorFilePos = 0;
 unsigned long TimerBacklight = 0;
-byte BatteryPercentage = 0;
 
 //  File reading variables
 #define BUFFPIXEL 50
@@ -129,8 +127,8 @@ void setup() {
   //  Check first init: initialize values
   if (EEPROM.read(BRIGHTNESS) == 255) {
     Params[SELECT].Value = "..."; 
-    Params[BRIGHTNESS].Value = "70";  
-    Params[DELAY].Value = "80";  
+    Params[BRIGHTNESS].Value = "10";  
+    Params[DELAY].Value = "25";  
     Params[COUNTDOWN].Value = "YES";  
     Params[BUZZER].Value = "NO";  
     Params[LEDS].Value = "60";
@@ -153,7 +151,7 @@ void setup() {
   }
 
   //  Init display backlight
-  analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 0, 255)));
+  analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 255, 0)));
   TimerBacklight = millis();
 
   //  Init buzzer
@@ -165,6 +163,7 @@ void setup() {
   for(byte i=0;i<Params[LEDS].Value.toInt();i++) {
     leds[i] = CRGB::Black;
   }
+  FastLED.setBrightness(Params[BRIGHTNESS].Value.toInt());
   FastLED.show();
 
   DrawInterface();
@@ -181,7 +180,7 @@ void loop() {
   
   //  Check if it's time to disable display backlight (no touch input after 30 sec)
   if (millis() - TimerBacklight >= 30000) {
-    analogWrite(BACKLIGHT_PIN, 0);
+    analogWrite(BACKLIGHT_PIN, 255);
   }
 
 }
@@ -193,11 +192,6 @@ void DrawInterface() {
   byte MenuY = 50;
   tft.fillScreen(GFX_BLACK);
 
-  //  TOP SECTION
-  tft.drawRect(200, 10, 35, 15, GFX_WHITE);
-  BatteryPercentage = map(analogRead(BATTERY_PIN), 0, 1023, 0, 100);
-  tft.fillRect(200, 10, round(35 * BatteryPercentage / 100), 15, GFX_WHITE);
-  tft.drawFastHLine(20, 35, 200, GFX_WHITE);
 
   //  MIDDLE SECTION
   switch(Page) {
@@ -318,7 +312,7 @@ void CheckTouchInput() {
 
   if (touch.touching()) {
     //  Switch on display backlight
-    analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 0, 255)));
+    analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 255, 0)));
     TimerBacklight = millis();
     //  Check button hit
     uint16_t x, y;
@@ -416,7 +410,7 @@ void CheckTouchInput() {
             if(Params[CursorMenuPos].Value.toInt() > 0) {
               Params[CursorMenuPos].Value = Params[CursorMenuPos].Value.toInt() - 10;
               //Re-set display backlight
-              analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 0, 255)));
+              analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 255, 0)));
             }
           break;
           case COUNTDOWN:
@@ -496,7 +490,7 @@ void CheckTouchInput() {
             if(Params[CursorMenuPos].Value.toInt() < 100) {
               Params[CursorMenuPos].Value = Params[CursorMenuPos].Value.toInt() + 10;
               //Re-set display backlight
-              analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 0, 255)));
+              analogWrite(BACKLIGHT_PIN, round(map(Params[BACKLIGHT].Value.toInt(), 0, 100, 255, 0)));
             }
           break;
           case DELAY:
@@ -561,7 +555,7 @@ void CheckTouchInput() {
             }
             if (CursorMenuPos == BRIGHTNESS) {
               //  Set strip brightness 
-              FastLED.setBrightness(map(Params[BRIGHTNESS].Value.toInt(), 0, 100, 0, 255));
+              FastLED.setBrightness(Params[BRIGHTNESS].Value.toInt());
             }
           break;
           case COUNTDOWN:
@@ -764,14 +758,14 @@ void StopScanImage(byte page) {
 void Buzz(int interval, byte repeat) {
   if (Params[BUZZER].Value == "YES") {
     if (repeat == 0) {
-      digitalWrite(BUZZER_PIN, HIGH);
+      analogWrite(BUZZER_PIN, 70);
       delay(interval);
-      digitalWrite(BUZZER_PIN, LOW);
+      analogWrite(BUZZER_PIN, 0);
     } else {
       for (byte i=0;i<repeat;i++) {
-        digitalWrite(BUZZER_PIN, HIGH);
+        analogWrite(BUZZER_PIN, 70);
         delay(interval);
-        digitalWrite(BUZZER_PIN, LOW);
+        analogWrite(BUZZER_PIN, 0);
         delay(interval);
       }
     }
