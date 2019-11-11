@@ -25,7 +25,7 @@
 #ifdef SDCS
   #define SD_CS SDCS
 #else
-  #define SD_CS 10
+  #define SD_CS 9
 #endif
 #define TFT_DC 5
 #define TFT_CS 2
